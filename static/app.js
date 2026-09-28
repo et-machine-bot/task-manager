@@ -140,10 +140,10 @@ function renderSummary(source) {
     button.setAttribute("aria-pressed", pressed ? "true" : "false");
   });
   document.getElementById("overdue-note").textContent = overdue
-    ? `期限超過が ${overdue} 件あります`
+    ? `期限超過が${overdue}件あります`
     : "";
   document.getElementById("today-label").textContent = state.today
-    ? `今日は ${formatDate(state.today)} です`
+    ? `今日は${formatDate(state.today)}です`
     : "";
   document.getElementById("clear-filters").hidden = !filtersActive();
 }
@@ -160,9 +160,13 @@ function renderTasks() {
     return;
   }
 
-  summary.textContent = filtersActive()
-    ? `${state.tasks.length} 件を表示しています`
-    : `タスクは ${state.tasks.length} 件です`;
+  if (state.tasks.length === 0 && !filtersActive()) {
+    summary.textContent = "";
+  } else if (filtersActive()) {
+    summary.textContent = `${state.tasks.length}件を表示しています`;
+  } else {
+    summary.textContent = `タスクは${state.tasks.length}件です`;
+  }
 
   if (state.tasks.length === 0) {
     status.textContent = filtersActive()
