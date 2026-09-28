@@ -1,0 +1,133 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <meta name="color-scheme" content="light">
+  <title>チームタスク</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='8' fill='%23fbf8f3' stroke='%231f3d7a' stroke-width='4'/%3E%3Ctext x='32' y='44' text-anchor='middle' font-size='32' font-family='serif' fill='%231f3d7a'%3E任%3C/text%3E%3C/svg%3E">
+  <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
+</head>
+<body>
+  <header class="site-header">
+    <div class="brand">
+      <div class="brand-mark" aria-hidden="true">任</div>
+      <div>
+        <h1>チームタスク</h1>
+        <p class="lede">やること、担当、期限をひとつにまとめる</p>
+      </div>
+    </div>
+    <p class="today" id="today-label">読み込み中…</p>
+  </header>
+
+  <main>
+    <p id="load-error" class="banner" hidden></p>
+
+    <section class="panel" aria-labelledby="stats-heading">
+      <h2 id="stats-heading" class="visually-hidden">ステータスごとの件数</h2>
+      <div class="stats" role="group" aria-label="ステータスで絞り込む">
+        <button type="button" class="stat" data-status="未着手" aria-pressed="false">
+          <span class="stat-label">未着手</span>
+          <span class="stat-count" data-count="未着手">0</span>
+        </button>
+        <button type="button" class="stat" data-status="進行中" aria-pressed="false">
+          <span class="stat-label">進行中</span>
+          <span class="stat-count" data-count="進行中">0</span>
+        </button>
+        <button type="button" class="stat" data-status="完了" aria-pressed="false">
+          <span class="stat-label">完了</span>
+          <span class="stat-count" data-count="完了">0</span>
+        </button>
+      </div>
+      <p class="overdue-note" id="overdue-note"></p>
+    </section>
+
+    <section class="toolbar" aria-label="絞り込みと追加">
+      <div class="filters">
+        <label>
+          担当者
+          <select id="filter-assignee">
+            <option value="">すべて</option>
+          </select>
+        </label>
+        <label>
+          ステータス
+          <select id="filter-status">
+            <option value="">すべて</option>
+            <option value="未着手">未着手</option>
+            <option value="進行中">進行中</option>
+            <option value="完了">完了</option>
+          </select>
+        </label>
+        <button type="button" class="text-button" id="clear-filters" hidden>絞り込みを解除</button>
+      </div>
+      <button type="button" class="primary" id="add-button">タスクを追加</button>
+    </section>
+
+    <p class="legend">赤枠の「期限超過」は、完了していなくて期限の日を過ぎたタスクです。期限の当日は超過になりません。</p>
+    <p id="list-summary" class="list-summary"></p>
+    <p id="list-status" class="list-status">読み込み中…</p>
+    <ul id="task-list" class="task-list"></ul>
+    <div id="live" class="visually-hidden" aria-live="polite"></div>
+  </main>
+
+  <footer class="site-footer">
+    <p>データはこのパソコンの中に保存されます。ログインはありません。</p>
+  </footer>
+
+  <dialog id="task-dialog" aria-labelledby="dialog-title">
+    <form id="task-form" class="dialog-card" autocomplete="off" novalidate>
+      <h2 id="dialog-title">タスクを追加</h2>
+      <p id="form-error" class="form-error" hidden></p>
+
+      <label>
+        タイトル <span class="required">必須</span>
+        <input name="title" type="text" maxlength="200" required placeholder="例: 企画書を共有する">
+      </label>
+
+      <label>
+        担当者
+        <input name="assignee_name" type="text" maxlength="50" list="assignee-list" placeholder="名前を選ぶか、新しく入力">
+      </label>
+      <datalist id="assignee-list"></datalist>
+      <p class="field-hint">一覧から選ぶか、新しい名前を入力すると担当者として登録されます。空欄なら担当者なしです。</p>
+
+      <div class="field-row">
+        <label>
+          期限
+          <input name="due_date" type="date">
+        </label>
+        <label>
+          ステータス
+          <select name="status">
+            <option value="未着手">未着手</option>
+            <option value="進行中">進行中</option>
+            <option value="完了">完了</option>
+          </select>
+        </label>
+      </div>
+
+      <div class="dialog-actions">
+        <button type="button" class="ghost" id="cancel-button">キャンセル</button>
+        <button type="submit" class="primary" id="save-button">保存</button>
+      </div>
+    </form>
+  </dialog>
+
+  <dialog id="confirm-dialog" aria-labelledby="confirm-title">
+    <form method="dialog" class="dialog-card">
+      <h2 id="confirm-title">削除の確認</h2>
+      <p id="confirm-message"></p>
+      <div class="dialog-actions">
+        <button type="submit" class="ghost" value="cancel">キャンセル</button>
+        <button type="submit" class="danger" value="ok">削除する</button>
+      </div>
+    </form>
+  </dialog>
+
+  <noscript>
+    <p class="banner noscript">この画面を使うには JavaScript をオンにしてください。</p>
+  </noscript>
+  <script src="{{ url_for('static', filename='app.js') }}" defer></script>
+</body>
+</html>
